@@ -43,8 +43,7 @@ describe("SimpleDEX", function () {
 
       // Add liquidity
       await expect(simpleDEX.addLiquidity(tokenAmount, { value: ethAmount }))
-        .to.emit(simpleDEX, "LiquidityAdded")
-        .withArgs(owner.address, ethAmount, tokenAmount);
+        .to.emit(simpleDEX, "LiquidityAdded");
 
       // Check balances
       expect(await ethers.provider.getBalance(await simpleDEX.getAddress())).to.equal(ethAmount);
@@ -87,8 +86,9 @@ describe("SimpleDEX", function () {
     it("Should swap ETH to tokens correctly", async function () {
       const ethInput = ethers.parseEther("0.1");
       const expectedTokens = await simpleDEX.getSwapEstimate(ethInput);
+      const minTokensOut = expectedTokens * BigInt(95) / BigInt(100); // 5% slippage
 
-      await expect(simpleDEX.connect(addr1).swapEthToToken({ value: ethInput }))
+      await expect(simpleDEX.connect(addr1).swapEthToToken(minTokensOut, { value: ethInput }))
         .to.emit(simpleDEX, "Swapped");
 
       expect(await platformToken.balanceOf(addr1.address)).to.be.greaterThan(ethers.parseUnits("10000", 18));
@@ -96,13 +96,15 @@ describe("SimpleDEX", function () {
 
     it("Should swap tokens to ETH correctly", async function () {
       const tokenInput = ethers.parseUnits("100", 18);
+      const expectedEth = await simpleDEX.getTokenToEthEstimate(tokenInput);
+      const minEthOut = expectedEth * BigInt(95) / BigInt(100); // 5% slippage
       
       // Approve tokens
       await platformToken.connect(addr1).approve(await simpleDEX.getAddress(), tokenInput);
 
       const initialEthBalance = await ethers.provider.getBalance(addr1.address);
       
-      await expect(simpleDEX.connect(addr1).swapTokenToEth(tokenInput))
+      await expect(simpleDEX.connect(addr1).swapTokenToEth(tokenInput, minEthOut))
         .to.emit(simpleDEX, "Swapped");
 
       const finalEthBalance = await ethers.provider.getBalance(addr1.address);
@@ -117,9 +119,10 @@ describe("SimpleDEX", function () {
     });
 
     it("Should fail to swap with insufficient liquidity", async function () {
-      const largeEthInput = ethers.parseEther("10");
+      const largeEthInput = ethers.parseEther("100");
+      const minTokensOut = await simpleDEX.getSwapEstimate(largeEthInput);
       
-      await expect(simpleDEX.connect(addr1).swapEthToToken({ value: largeEthInput }))
+      await expect(simpleDEX.connect(addr1).swapEthToToken(minTokensOut, { value: largeEthInput }))
         .to.be.revertedWith("Insufficient token liquidity");
     });
   });

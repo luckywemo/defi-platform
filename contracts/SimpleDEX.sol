@@ -124,6 +124,34 @@ contract SimpleDEX is Ownable, ReentrancyGuard {
     function getUserLiquidity(address user) public view returns (uint256) {
         return liquidityShares[user];
     }
+
+    function getSwapEstimate(uint256 ethInput) public view returns (uint256) {
+        if (ethInput == 0) return 0;
+        
+        uint256 ethReserve = address(this).balance;
+        uint256 tokenReserve = token.balanceOf(address(this));
+        
+        if (ethReserve == 0 || tokenReserve == 0) return 0;
+        
+        uint256 amountInWithFee = ethInput * (10000 - FEE_PERCENT) / 10000;
+        uint256 tokenOutput = (amountInWithFee * tokenReserve) / (ethReserve + amountInWithFee);
+        
+        return tokenOutput;
+    }
+
+    function getTokenToEthEstimate(uint256 tokenInput) public view returns (uint256) {
+        if (tokenInput == 0) return 0;
+        
+        uint256 ethReserve = address(this).balance;
+        uint256 tokenReserve = token.balanceOf(address(this));
+        
+        if (ethReserve == 0 || tokenReserve == 0) return 0;
+        
+        uint256 amountInWithFee = tokenInput * (10000 - FEE_PERCENT) / 10000;
+        uint256 ethOutput = (amountInWithFee * ethReserve) / (tokenReserve + amountInWithFee);
+        
+        return ethOutput;
+    }
 }
 
 
