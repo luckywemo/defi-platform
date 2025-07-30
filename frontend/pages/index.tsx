@@ -1,38 +1,65 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import { useState } from 'react';
+import { useAccount, useBalance } from 'wagmi';
 import styles from '../styles/Home.module.css';
+import SwapComponent from '../components/SwapComponent';
+import LiquidityComponent from '../components/LiquidityComponent';
 
 const Home: NextPage = () => {
+  const [activeTab, setActiveTab] = useState<'swap' | 'liquidity'>('swap');
+  const { address, isConnected } = useAccount();
+  const { data: balance } = useBalance({ address });
+
   return (
     <div className={styles.container}>
       <Head>
         <title>DeFi Platform</title>
-        <meta name="description" content="A simple DeFi Platform" />
+        <meta name="description" content="A comprehensive DeFi Platform" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
-        <ConnectButton />
+        <div className={styles.header}>
+          <h1 className={styles.title}>DeFi Platform</h1>
+          <ConnectButton />
+        </div>
 
-        <h1 className={styles.title}>
-          Welcome to the DeFi Platform!
-        </h1>
-
-        <p className={styles.description}>
-          Get started by connecting your wallet.
-        </p>
-
-        <div className={styles.grid}>
-          <div className={styles.card}>
-            <h2>Swap</h2>
-            <p>Swap your tokens seamlessly.</p>
+        {isConnected && (
+          <div className={styles.walletInfo}>
+            <p>Address: {address?.slice(0, 6)}...{address?.slice(-4)}</p>
+            <p>Balance: {balance?.formatted.slice(0, 6)} {balance?.symbol}</p>
           </div>
+        )}
 
-          <div className={styles.card}>
-            <h2>Liquidity</h2>
-            <p>Provide liquidity and earn rewards.</p>
-          </div>
+        <div className={styles.tabContainer}>
+          <button 
+            className={`${styles.tab} ${activeTab === 'swap' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('swap')}
+          >
+            Swap
+          </button>
+          <button 
+            className={`${styles.tab} ${activeTab === 'liquidity' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('liquidity')}
+          >
+            Liquidity
+          </button>
+        </div>
+
+        <div className={styles.content}>
+          {!isConnected ? (
+            <div className={styles.connectPrompt}>
+              <h2>Connect Your Wallet</h2>
+              <p>Connect your wallet to start trading and providing liquidity</p>
+            </div>
+          ) : (
+            <>
+              {activeTab === 'swap' && <SwapComponent />}
+              {activeTab === 'liquidity' && <LiquidityComponent />}
+            </>
+          )}
         </div>
       </main>
     </div>
