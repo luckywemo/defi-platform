@@ -131,11 +131,52 @@ await simpleDEX.swapTokenToEth(tokenAmount);
 
 This project is licensed under the MIT License.
 
+## Governance System 🏛️
+
+### GovernanceToken (DGT)
+- **ERC20Votes** compatible governance token
+- **100M max supply**, 10M initial supply
+- Delegation system for voting power
+- Minting controls for future rewards
+
+### DeFiGovernance Contract
+- **OpenZeppelin Governor** framework
+- **1000 DGT** minimum to create proposals
+- **1 day** voting delay, **1 week** voting period
+- **4% quorum** requirement
+- **Timelock** protection with 1-day delay
+
+### Treasury Management
+- Multi-token treasury system
+- Governance-controlled fee parameters
+- Emergency withdrawal mechanisms
+- ETH and ERC20 token support
+
+### Governance Process
+1. **Propose**: Create proposals with 1000+ DGT
+2. **Vote**: Community votes for/against/abstain
+3. **Queue**: Successful proposals enter timelock
+4. **Execute**: Execute after timelock delay
+
+### Deployment Commands
+```bash
+# Deploy governance system locally
+npm run deploy:governance:local
+
+# Deploy to Base Sepolia testnet
+npm run deploy:governance:base-sepolia
+
+# Run governance tests
+npm run test:governance
+```
+
 ## Roadmap
 
+- [x] **Governance token implementation** ✅
+- [x] **Treasury management system** ✅
+- [x] **Voting and proposal system** ✅
 - [ ] Yield farming contracts
-- [ ] Governance token implementation
 - [ ] Multi-token DEX support
-- [ ] Frontend interface
+- [ ] Frontend governance interface
 - [ ] Mobile app integration
 - [ ] Advanced trading features

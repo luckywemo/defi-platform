@@ -4,9 +4,12 @@
   "main": "index.js",
   "scripts": {
     "test": "npx hardhat test",
+    "test:governance": "npx hardhat test test/Governance.js",
     "compile": "npx hardhat compile",
     "deploy:local": "npx hardhat run scripts/deployDEX.js --network hardhat",
+    "deploy:governance:local": "npx hardhat run scripts/deployGovernance.js --network hardhat",
     "deploy:base-sepolia": "npx hardhat run scripts/deployDEX.js --network base-sepolia",
+    "deploy:governance:base-sepolia": "npx hardhat run scripts/deployGovernance.js --network base-sepolia",
     "node": "npx hardhat node"
   },
   "keywords": [],
