@@ -6,9 +6,11 @@ import { useAccount, useBalance } from 'wagmi';
 import styles from '../styles/Home.module.css';
 import SwapComponent from '../components/SwapComponent';
 import LiquidityComponent from '../components/LiquidityComponent';
+import YieldFarmComponent from '../components/YieldFarmComponent';
+import LendingComponent from '../components/LendingComponent';
 
 const Home: NextPage = () => {
-  const [activeTab, setActiveTab] = useState<'swap' | 'liquidity'>('swap');
+  const [activeTab, setActiveTab] = useState<'swap' | 'liquidity' | 'yieldfarm' | 'lending'>('swap');
   const { address, isConnected } = useAccount();
   const { data: balance } = useBalance({ address });
 
@@ -46,6 +48,18 @@ const Home: NextPage = () => {
           >
             Liquidity
           </button>
+          <button 
+            className={`${styles.tab} ${activeTab === 'yieldfarm' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('yieldfarm')}
+          >
+            Yield Farming
+          </button>
+          <button 
+            className={`${styles.tab} ${activeTab === 'lending' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('lending')}
+          >
+            Lending
+          </button>
         </div>
 
         <div className={styles.content}>
@@ -58,6 +72,8 @@ const Home: NextPage = () => {
             <>
               {activeTab === 'swap' && <SwapComponent />}
               {activeTab === 'liquidity' && <LiquidityComponent />}
+              {activeTab === 'yieldfarm' && <YieldFarmComponent />}
+              {activeTab === 'lending' && <LendingComponent />}
             </>
           )}
         </div>
